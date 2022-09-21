@@ -1,0 +1,22 @@
+version: '3'
+services:
+
+  secret_friend:
+    build: .
+    image: secret_friend:latest
+    container_name: secret_friend
+    ports:
+      - "8080:8080"
+    environment:
+      - "token=XXXXX"
+      - "smtp_port=587"
+      - "smtp_server_domain_name=smtp.gmail.com"
+      - "sender_mail=XXXXX"
+      - "smtp_password=XXXXX"
+
+    networks:
+      - reverseproxy-nw
+
+networks:
+  reverseproxy-nw:
+    external: true

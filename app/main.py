@@ -36,7 +36,7 @@ async def info(
 
     else:  # ONLY FOR TEST, DONT SEND EMAIL
         response = LotteryResponse(
-            status="OK" if mail_status else "ERROR",
+            status="TEST_ONLY",
             result=[{r[0].name: r[1].name} for r in results],
         )
 
