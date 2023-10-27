@@ -27,7 +27,7 @@ class LotteryRequest(BaseModel):
 
 class LotteryResponse(BaseModel):
     status: str
-    result: list[dict[str, str]]] | None = None
+    result: list[dict[str, str]] | None = None
 
     class Config:
         json_schema_extra = {
