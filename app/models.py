@@ -1,4 +1,3 @@
-from typing import Optional, List, Dict, Tuple
 from pydantic import BaseModel
 
 
@@ -8,12 +7,12 @@ class Person(BaseModel):
 
 
 class LotteryRequest(BaseModel):
-    friends: List[Person]
+    friends: list[Person]
     title: str
     budget: str = "Max money to be spent"
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "friends": [
                     {"name": "Friend 1", "email": "friend1@gmail.com"},
@@ -28,10 +27,10 @@ class LotteryRequest(BaseModel):
 
 class LotteryResponse(BaseModel):
     status: str
-    result: Optional[List[Dict[str, str]]]
+    result: list[dict[str, str]]] | None = None
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "status": "OK",
                 "result": [
