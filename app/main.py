@@ -7,7 +7,7 @@ from app.utils import matchup, send_email
 # MAIN APP
 app = FastAPI(
     title="Secret Friend Lottery",
-    version=1.0,
+    version="1.0",
     swagger_ui_parameters={
         "defaultModelsExpandDepth": -1,
         "displayRequestDuration": True,
