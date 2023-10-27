@@ -33,7 +33,7 @@ def send_email(persons: List[Tuple[Person, Person]], title: str, budget: str) ->
 
     mail_status = True
     for friends in persons:
-        content = f"{friends[1].name} o teu amigo secreto: {friends[1].name}.\n\nCompra-lhe uma prenda porreira no valor de {budget}\n"
+        content = f"{friends[0].name} o teu amigo secreto {friends[1].name}.\n\nCompra-lhe uma prenda porreira no valor de {budget}\n"
         status = service.sendmail(from_addr=sender_mail, to_addrs=friends[0].email, msg=f"Subject: {title}\n{content}".encode('utf-8'))
         if len(status) > 0:
           mail_status = False
