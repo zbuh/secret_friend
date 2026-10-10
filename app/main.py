@@ -22,6 +22,8 @@ ACCESS_CODE = config("token", cast=str, default="")
 BASE_URL = config("base_url", cast=str, default="").rstrip("/")
 HERE = Path(__file__).parent
 log = logging.getLogger("uvicorn.error")
+# The Docker healthcheck hits /healthz every 30s; keep it out of the access log.
+logging.getLogger("uvicorn.access").addFilter(lambda record: "/healthz" not in record.getMessage())
 
 # Per-IP (or per-event) limits; generous for a family, tight for a script.
 LIMITS = {
