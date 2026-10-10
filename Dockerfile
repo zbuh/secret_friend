@@ -1,5 +1,8 @@
 FROM python:3.12-slim
 
+LABEL org.opencontainers.image.source=https://github.com/zbuh/secret_friend \
+      org.opencontainers.image.description="Amigo Secreto: sorteio de Natal"
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     db_path=/data/secret_friend.db \
