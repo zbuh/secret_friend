@@ -1,42 +1,35 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 
 class Person(BaseModel):
-    name: str
-    email: str
+    name: str = Field(min_length=1, max_length=80)
+    email: str = Field(default="", max_length=200)
+    group: str = Field(default="", max_length=80)
+    manager: bool = False
+
+    @field_validator("name", "email", "group")
+    @classmethod
+    def strip(cls, v: str) -> str:
+        return v.strip()
 
 
-class LotteryRequest(BaseModel):
-    friends: list[Person]
-    title: str
-    budget: str = "Max money to be spent"
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "friends": [
-                    {"name": "Friend 1", "email": "friend1@gmail.com"},
-                    {"name": "Friend 2", "email": "friend2@gmail.com"},
-                    {"name": "Friend 3", "email": "friend3@gmail.com"},
-                ],
-                "title": "Title of the event",
-                "budget": "10 eur.",
-            }
-        }
+class EventRequest(BaseModel):
+    title: str = Field(min_length=1, max_length=120)
+    budget: str = Field(default="", max_length=60)
+    event_date: str = Field(default="", pattern=r"^(\d{4}-\d{2}-\d{2})?$")
+    event_time: str = Field(default="", pattern=r"^(([01]\d|2[0-3]):[0-5]\d)?$")
+    message: str = Field(default="", max_length=1000)
+    participants: list[Person] = Field(min_length=3, max_length=200)
 
 
-class LotteryResponse(BaseModel):
-    status: str
-    result: list[dict[str, str]] | None = None
+class LoginRequest(BaseModel):
+    password: str = Field(max_length=200)
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "status": "OK",
-                "result": [
-                    {"Friend 1": "Friend 2"},
-                    {"Friend 2": "Friend 3"},
-                    {"Friend 3": "Friend 1"},
-                ],
-            }
-        }
+
+class ClaimRequest(BaseModel):
+    participant_id: int
+    pin: str = Field(pattern=r"^\d{4}$")
+
+
+class EmailRequest(BaseModel):
+    ids: list[int] | None = None  # None = everyone with an email who wasn't emailed yet

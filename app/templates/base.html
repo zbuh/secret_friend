@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>{% block title %}Amigo Secreto{% endblock %}</title>
+  {% block meta %}{% endblock %}
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+  <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}?v=2">
+</head>
+<body data-page="{% block page %}{% endblock %}">
+  <div class="snow" aria-hidden="true"></div>
+  <header class="top">
+    <a href="{{ home_url | default("/") }}" class="brand">🎁 Amigo Secreto</a>
+  </header>
+  <main class="wrap">
+    {% block content %}{% endblock %}
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="{{ url_for('static', path='app.js') }}?v=2"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }} · Lembrança{% endblock %}
+{% block page %}memory{% endblock %}
+{% block content %}
+{% if logged_in %}<p class="back"><a href="/">← Todos os sorteios</a></p>{% endif %}
+<section class="hero center memory-hero">
+  <p class="eyebrow">Lembrança 🎄</p>
+  <h1>{{ event.title }}</h1>
+  <p class="chips center">
+    {% if event.event_date %}<span class="chip" data-date="{{ event.event_date }}" data-time="{{ event.event_time }}">📅 {{ event.event_date }}</span>{% endif %}
+    <span class="chip">👥 {{ people|length }} pessoas</span>
+    {% if event.budget %}<span class="chip">💶 {{ event.budget }}</span>{% endif %}
+  </p>
+</section>
+
+<div class="card memory" id="memory" data-api="/api/events/{{ event.admin_token }}" data-title="{{ event.title }}">
+  <h2>Quem ofereceu a quem</h2>
+  {% for cycle in chains %}
+  <ol class="chain">
+    {% for p in cycle %}
+    <li>
+      <span class="giver">{{ p.name }}</span>
+      <span class="arrow" aria-label="ofereceu a">🎁</span>
+      <span class="receiver">{{ (cycle[loop.index] if not loop.last else cycle[0]).name }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+  {% endfor %}
+  {% if event.message %}<p class="message muted">{{ event.message }}</p>{% endif %}
+</div>
+
+<details class="card danger-zone">
+  <summary>Mais opções</summary>
+  <div class="danger-actions">
+    {% if can_reopen %}
+    <div>
+      <button class="btn ghost" id="reopen">↩️ Reabrir sorteio</button>
+      <p class="hint">Volta a ficar ativo: links, emails e gestão de nomes.</p>
+    </div>
+    {% endif %}
+    <div>
+      <button class="btn danger" id="delete">Apagar sorteio</button>
+      <p class="hint">Apaga também esta lembrança.</p>
+    </div>
+  </div>
+</details>
+{% endblock %}

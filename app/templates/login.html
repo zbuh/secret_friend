@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block page %}login{% endblock %}
+{% block content %}
+<section class="hero center">
+  <h1>Amigo Secreto</h1>
+  <p class="muted">Área de gestão. Recebeste um link de um sorteio? Abre-o diretamente — não precisas de password.</p>
+</section>
+
+{% if configured %}
+<form class="card login" id="login-form">
+  <label class="field">
+    <span>Password</span>
+    <input name="password" type="password" autocomplete="current-password" required autofocus>
+  </label>
+  <p id="login-error" class="error" hidden></p>
+  <button class="btn primary big" type="submit">Entrar</button>
+</form>
+{% else %}
+<div class="card">
+  <p>A área de gestão está desligada: define a password na variável de ambiente <code>token</code> e reinicia a app.</p>
+</div>
+{% endif %}
+{% endblock %}
