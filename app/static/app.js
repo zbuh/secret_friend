@@ -67,11 +67,31 @@ function initCreate() {
   const tpl = $("#person-tpl");
   const DRAFT = "sf-draft";
 
+  // People from earlier draws: picking a known name fills in their email and group (only if empty).
+  const known = new Map($$("#known-people option").map((o) => [
+    o.value.toLocaleLowerCase("pt"), { name: o.value, email: o.dataset.email, group: o.dataset.group },
+  ]));
+
+  function fillKnown(row) {
+    const k = known.get($(".p-name", row).value.trim().toLocaleLowerCase("pt"));
+    if (!k) return false;
+    const email = $(".p-email", row), group = $(".p-group", row);
+    let filled = false;
+    if (!email.value && k.email) { email.value = k.email; filled = true; }
+    if (!group.value && k.group) { group.value = k.group; filled = true; }
+    if (filled) {
+      row.classList.add("autofilled");
+      setTimeout(() => row.classList.remove("autofilled"), 1200);
+    }
+    return filled;
+  }
+
   function addPerson(p = {}, focus = false) {
     const row = tpl.content.firstElementChild.cloneNode(true);
     $(".p-name", row).value = p.name || "";
     $(".p-email", row).value = p.email || "";
     $(".p-group", row).value = p.group || "";
+    if (p.fromPaste) fillKnown(row);
     $(".p-manager", row).checked = !!p.manager;
     list.append(row);
     if (focus) $(".p-name", row).focus();
@@ -102,8 +122,19 @@ function initCreate() {
     store.set(DRAFT, { ...data, participants: people() });
   }
 
-  list.addEventListener("input", refresh);
-  list.addEventListener("change", refresh);
+  list.addEventListener("input", (e) => {
+    // Datalist picks fire "input" with the full value; typing an exact known name works too.
+    if (e.target.classList.contains("p-name")) fillKnown(e.target.closest(".person"));
+    refresh();
+  });
+  list.addEventListener("change", (e) => {
+    // On leaving the field, use the known spelling ("ana" → "Ana").
+    if (e.target.classList.contains("p-name")) {
+      const k = known.get(e.target.value.trim().toLocaleLowerCase("pt"));
+      if (k) e.target.value = k.name;
+    }
+    refresh();
+  });
 
   // 24h time picker: two selects feeding the hidden event_time field
   const hour = $("#hour"), minute = $("#minute"), time = form.elements.event_time;
@@ -142,7 +173,7 @@ function initCreate() {
     $$(".person", list).forEach((row) => { if (!$(".p-name", row).value.trim()) row.remove(); });
     lines.forEach((line) => {
       const [name, email = "", group = ""] = line.split(/[,;\t]/).map((s) => s.trim());
-      if (name) addPerson({ name, email, group });
+      if (name) addPerson({ name, email, group, fromPaste: true });
     });
     $("#paste-text").value = "";
     $("#paste-box").hidden = true;

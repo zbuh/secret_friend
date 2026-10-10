@@ -12,6 +12,8 @@ guardados no servidor. Daí crias sorteios novos e geres os antigos.
 1. **Criar** — escreve o nome do evento, o valor e os participantes (pode colar uma lista).
    Pessoas do mesmo **grupo** (casais, irmãos…) nunca se tiram umas às outras.
    Marca o **gestor** 👑: o email dele inclui também o link de gestão desse sorteio, que funciona sem password.
+   Os nomes de quem já participou em sorteios anteriores aparecem como sugestão, e o email e o grupo são preenchidos
+   sozinhos (também ao colar uma lista só com nomes).
 2. **Enviar** — na página do sorteio, um clique envia a cada participante com email o seu **link pessoal**.
    O gestor recebe também o **link geral**, para o passar a quem não tem email.
    Se o sorteio tiver data (e hora, opcional), o email leva em anexo um **evento de calendário** (.ics),

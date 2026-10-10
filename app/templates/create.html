@@ -44,7 +44,7 @@
   </label>
 
   <h2>2. Participantes <span class="count" id="count">0</span></h2>
-  <p class="hint">Pessoas com o mesmo <b>grupo</b> (ex.: um casal, ou irmãos) nunca se tiram umas às outras. Marca o <b>gestor</b> 👑 (obrigatório, com email): recebe o link para gerir o sorteio.{% if email_enabled %} Com o email, a app envia o link a todos por ti.{% endif %}</p>
+  <p class="hint">Pessoas com o mesmo <b>grupo</b> (ex.: um casal, ou irmãos) nunca se tiram umas às outras. Marca o <b>gestor</b> 👑 (obrigatório, com email): recebe o link para gerir o sorteio.{% if known %} Ao escreveres o nome de alguém de sorteios anteriores, o email e o grupo são preenchidos sozinhos.{% endif %}{% if email_enabled %} Com o email, a app envia o link a todos por ti.{% endif %}</p>
 
   <div id="people" class="people"></div>
 
@@ -66,7 +66,7 @@
 
 <template id="person-tpl">
   <div class="person">
-    <input class="p-name" placeholder="Nome" maxlength="80" aria-label="Nome">
+    <input class="p-name" placeholder="Nome" maxlength="80" aria-label="Nome" list="known-people" autocomplete="off">
     <input class="p-email" type="email" placeholder="Email" maxlength="200" aria-label="Email">
     <input class="p-group" placeholder="Grupo" maxlength="80" aria-label="Grupo" list="groups">
     <label class="manager" title="Marcar como gestor do sorteio"><input type="radio" name="manager" class="p-manager"><span>👑</span></label>
@@ -74,4 +74,8 @@
   </div>
 </template>
 <datalist id="groups"></datalist>
+<datalist id="known-people">
+  {% for p in known %}<option value="{{ p.name }}" data-email="{{ p.email }}" data-group="{{ p.group }}">{{ p.email }}</option>
+  {% endfor %}
+</datalist>
 {% endblock %}

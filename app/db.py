@@ -149,6 +149,25 @@ def list_events():
         ).fetchall()
 
 
+def known_people() -> list[dict]:
+    """Everyone who took part in a past draw, newest data first, one entry per name."""
+    with connect() as conn:
+        rows = conn.execute(
+            """SELECT p.name, p.email, p.group_name FROM participants p
+               JOIN events e ON e.id = p.event_id
+               ORDER BY e.created_at DESC, p.id DESC"""
+        ).fetchall()
+    people: dict[str, dict] = {}
+    for r in rows:
+        key = r["name"].casefold()
+        if key not in people:
+            people[key] = {"name": r["name"], "email": r["email"], "group": r["group_name"]}
+        elif not people[key]["email"] and r["email"]:
+            # Keep the most recent email we know, even if the latest draw had none.
+            people[key]["email"] = r["email"]
+    return sorted(people.values(), key=lambda p: p["name"].casefold())
+
+
 def get_event_by_share(share_token: str):
     with connect() as conn:
         event = conn.execute(

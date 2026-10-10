@@ -325,3 +325,29 @@ def test_chains_follow_who_gives_to_whom():
         {"id": 5, "name": "E", "target_id": 3},
     ]
     assert [[p["name"] for p in c] for c in chains(people)] == [["A", "B"], ["C", "D", "E"]]
+
+
+def test_known_people_suggested_on_create_page(client):
+    from app import db
+
+    assert client.post("/api/events", json=EVENT).status_code == 200
+    newer = {**EVENT, "participants": [
+        {"name": "ana", "group": "casal", "email": "ana.nova@x.pt", "manager": True},
+        {"name": "Rui", "group": "casal"},  # no email this year: keep the old one if there was any
+        {"name": "Zé", "email": "ze@x.pt"},
+        {"name": "Inês"},
+    ]}
+    assert client.post("/api/events", json=newer).status_code == 200
+
+    known = {p["name"].casefold(): p for p in db.known_people()}
+    assert known["ana"]["email"] == "ana.nova@x.pt"  # newest wins, one entry per name
+    assert len([n for n in known if n == "ana"]) == 1
+    assert known["zé"]["email"] == "ze@x.pt"
+    assert known["marta"]["group"] == ""
+
+    page = client.get("/novo").text
+    assert 'data-email="ana.nova@x.pt"' in page and 'value="Zé"' in page
+
+
+def test_known_people_hidden_without_login(anon):
+    assert "known-people" not in anon.get("/novo", follow_redirects=True).text
