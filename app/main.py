@@ -1,3 +1,4 @@
+import hashlib
 import hmac
 import logging
 import secrets
@@ -21,6 +22,8 @@ ACCESS_CODE = config("token", cast=str, default="")
 BASE_URL = config("base_url", cast=str, default="").rstrip("/")
 HERE = Path(__file__).parent
 log = logging.getLogger("uvicorn.error")
+# The Docker healthcheck hits /healthz every 30s; keep it out of the access log.
+logging.getLogger("uvicorn.access").addFilter(lambda record: "/healthz" not in record.getMessage())
 
 # Per-IP (or per-event) limits; generous for a family, tight for a script.
 LIMITS = {
@@ -53,6 +56,10 @@ async def lifespan(_: FastAPI):
 app = FastAPI(title="Amigo Secreto", version="2.0", lifespan=lifespan, docs_url=None, redoc_url=None)
 app.mount("/static", StaticFiles(directory=HERE / "static"), name="static")
 templates = Jinja2Templates(directory=HERE / "templates")
+# Cache-busting for /static: changes whenever a static file changes, so Cloudflare/browsers never serve stale JS/CSS.
+templates.env.globals["asset_version"] = hashlib.sha256(
+    b"".join(f.read_bytes() for f in sorted((HERE / "static").iterdir()))
+).hexdigest()[:10]
 
 
 @app.middleware("http")
