@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block page %}home{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-row">
+    <h1>Sorteios</h1>
+    <button class="link-btn" id="logout-admin">Sair</button>
+  </div>
+  <p><a class="btn primary" href="/novo">🎲 Criar novo sorteio</a></p>
+</section>
+
+<div class="card" id="draft" hidden>
+  <p>Tens um sorteio a meio: <b id="draft-title"></b></p>
+  <a class="btn small" href="/novo">Continuar</a>
+</div>
+
+{% if upcoming %}
+<h2 class="section">A decorrer</h2>
+<ul class="events">
+  {% for e in upcoming %}
+  <li>
+    <a class="card event" href="/e/{{ e.admin_token }}">
+      <span class="event-title">{{ e.title }}</span>
+      <span class="muted small">
+        {% if e.event_date %}<span data-date-short="{{ e.event_date }}">{{ e.event_date }}</span> · {% endif %}
+        {{ e.people }} pessoas · {{ e.viewed }} já viram
+        {% if e.managers %} · gestor: {{ e.managers }}{% endif %}
+      </span>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% elif not past %}
+<div class="card"><p class="muted">Ainda não há sorteios. Cria o primeiro!</p></div>
+{% endif %}
+
+{% if past %}
+<h2 class="section">Lembranças 🎄</h2>
+<ul class="events past">
+  {% for e in past %}
+  {% set year = (e.event_date or e.closed_at)[:4] %}
+  <li>
+    <a class="card event past-event" href="/e/{{ e.admin_token }}">
+      <span class="year">{{ year }}</span>
+      <span>
+        <span class="event-title">{{ e.title }}</span>
+        <span class="muted small">{{ e.people }} pessoas · ver quem ofereceu a quem</span>
+      </span>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

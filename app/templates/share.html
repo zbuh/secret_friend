@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }}{% endblock %}
+{% block meta %}
+<meta property="og:title" content="🎁 {{ event.title }}">
+<meta property="og:description" content="Escolhe o teu nome e descobre quem te calhou no amigo secreto!">
+{% endblock %}
+{% block page %}share{% endblock %}
+{% block content %}
+<section class="hero center">
+  <p class="eyebrow">Amigo secreto</p>
+  <h1>{{ event.title }}</h1>
+  <p class="muted">Quem és tu? Toca no teu nome.</p>
+</section>
+
+<div id="share" data-share="{{ event.share_token }}">
+  <a class="card continue" id="continue" hidden>
+    <span>Continuar como <b id="continue-name"></b></span><span aria-hidden="true">→</span>
+  </a>
+
+  <div class="names">
+    {% for p in people %}
+    {% set by_email = p.emailed_at and not p.claimed_at %}
+    <button class="name-btn{% if p.claimed_at or by_email %} claimed{% endif %}" data-id="{{ p.id }}" data-name="{{ p.name }}"
+            data-claimed="{{ 'true' if p.claimed_at else 'false' }}" data-by-email="{{ 'true' if by_email else 'false' }}">
+      <span>{{ p.name }}</span>
+      {% if p.claimed_at %}<small>já escolhido · entrar com PIN</small>
+      {% elif by_email %}<small>✉️ recebeu link por email</small>{% endif %}
+    </button>
+    {% endfor %}
+  </div>
+</div>
+
+<dialog id="pin-dialog" class="dialog">
+  <form method="dialog" id="pin-form">
+    <h2 id="pin-title"></h2>
+    <p class="hint" id="pin-hint"></p>
+    <input id="pin" inputmode="numeric" pattern="\d{4}" maxlength="4" autocomplete="off"
+           class="pin" placeholder="••••" aria-label="PIN de 4 dígitos" required>
+    <p id="pin-error" class="error" hidden></p>
+    <div class="dialog-actions">
+      <button type="button" class="btn ghost" id="pin-cancel">Cancelar</button>
+      <button type="submit" class="btn primary" id="pin-submit">Continuar</button>
+    </div>
+  </form>
+</dialog>
+{% endblock %}

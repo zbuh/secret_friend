@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }} · Organizador{% endblock %}
+{% block page %}admin{% endblock %}
+{% block content %}
+{% if logged_in %}<p class="back"><a href="/">← Todos os sorteios</a></p>{% endif %}
+<section class="hero">
+  <p class="eyebrow">Gestão do sorteio</p>
+  <h1>{{ event.title }}</h1>
+  <p class="chips">
+    <span class="chip">👥 {{ people|length }} pessoas</span>
+    {% if event.budget %}<span class="chip">💶 {{ event.budget }}</span>{% endif %}
+    {% if event.event_date %}<span class="chip" data-date="{{ event.event_date }}" data-time="{{ event.event_time }}">📅 {{ event.event_date }}</span>{% endif %}
+  </p>
+</section>
+
+<div class="card" id="admin" data-admin-url="{{ admin_url }}" data-title="{{ event.title }}">
+  <h2>Enviar aos participantes</h2>
+  {% if email_enabled and has_emails %}
+  <p class="hint">Quem tem email recebe um <b>link pessoal</b>: abre e vê logo quem lhe calhou.{% if people | rejectattr('email') | list %} Quem não tem email usa o <b>link geral</b> abaixo: escolhe o nome e define um PIN.{% endif %}</p>
+  <button class="btn primary email-all" id="email-all">✉️ Enviar links pessoais por email a quem ainda não recebeu</button>
+  <h3 class="sub">Link geral</h3>
+  {% else %}
+  <p class="hint">Envia este link a todos. Cada pessoa abre-o, escolhe o seu nome e define um PIN.</p>
+  {% endif %}
+  <div class="copyline">
+    <input readonly value="{{ share_url }}" aria-label="Link para os participantes">
+    <button class="btn small primary" data-copy="{{ share_url }}">Copiar</button>
+  </div>
+  {% if has_emails and not email_enabled %}
+  <p class="hint">Para enviar links pessoais por email, configura o SMTP no servidor (ver README).</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="progress-head">
+    <h2>Quem já viu</h2>
+    <span class="muted"><b>{{ viewed }}</b> de {{ people|length }}</span>
+  </div>
+  <div class="bar"><div style="width: {{ (viewed * 100 / people|length)|round }}%"></div></div>
+
+  <ul class="list">
+    {% for p in people %}
+    <li class="item" data-id="{{ p.id }}" data-name="{{ p.name }}">
+      <div class="who">
+        <span class="name">{{ p.name }}</span>
+        {% if p.is_manager %}<span class="tag manager-tag" title="Gestor: o email dele inclui o link desta página">👑 gestor</span>{% endif %}
+        {% if p.group_name %}<span class="tag">{{ p.group_name }}</span>{% endif %}
+        <span class="status">
+          {% if p.viewed_at %}<span class="ok">✓ Viu</span>
+          {% elif p.claimed_at %}<span class="ok">Escolheu o nome</span>
+          {% else %}<span class="wait">Ainda não entrou</span>{% endif %}
+          {% if p.failed_pins >= 5 %}<span class="locked">· bloqueado</span>{% endif %}
+          {% if p.emailed_at %}<span class="muted">· email enviado</span>{% endif %}
+        </span>
+      </div>
+      <div class="btns">
+        {% if p.claimed_at or p.emailed_at %}
+        <button class="btn small ghost release" title="Se alguém escolheu este nome por engano, ou a pessoa esqueceu o PIN">Libertar nome</button>
+        {% endif %}
+        {% if email_enabled and p.email %}
+        <button class="btn small ghost email-one" title="{{ p.email }}">{{ 'Reenviar email' if p.emailed_at else 'Email' }}</button>
+        {% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  <p class="hint">«Libertar nome» serve para quando alguém escolheu o nome errado, esqueceu o PIN ou o link pessoal foi parar às mãos erradas: o link antigo deixa de funcionar e o nome fica livre. Depois podes reenviar o email, com um link novo.</p>
+</div>
+
+<div class="card notice">
+  <p><b>Link de gestão.</b> Quem o tiver pode gerir este sorteio{% if people | selectattr('is_manager') | list %} — vai no email do gestor{% endif %}. Também o encontras na área de gestão, com a password.</p>
+  <div class="copyline">
+    <input readonly value="{{ admin_url }}" aria-label="Link do organizador">
+    <button class="btn small" data-copy="{{ admin_url }}">Copiar</button>
+  </div>
+</div>
+
+<details class="card danger-zone">
+  <summary>Mais opções</summary>
+  <div class="danger-actions">
+    <div>
+      <button class="btn ghost" id="redraw" {% if viewed %}disabled{% endif %}>🎲 Refazer sorteio</button>
+      <p class="hint">{% if viewed %}Já não é possível: alguém já viu o seu amigo secreto.{% else %}O link mantém-se, só mudam os pares.{% endif %}</p>
+    </div>
+    <div>
+      <button class="btn ghost" id="close">🎄 Terminar sorteio</button>
+      <p class="hint">A troca já aconteceu? Fica guardado como lembrança, com os pares à vista. Acontece sozinho no dia a seguir à data.</p>
+    </div>
+    <div>
+      <button class="btn danger" id="delete">Apagar sorteio</button>
+      <p class="hint">Apaga tudo e o link deixa de funcionar.</p>
+    </div>
+  </div>
+</details>
+{% endblock %}

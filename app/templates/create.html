@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block page %}create{% endblock %}
+{% block content %}
+<p class="back"><a href="/">← Voltar</a></p>
+<section class="hero">
+  <h1>Novo sorteio</h1>
+  <p class="muted">Preenche os nomes e carrega em sortear. Depois envias a todos o mesmo link, por email ou como preferires: cada um escolhe o seu nome e descobre quem lhe calhou. Ninguém, nem tu, fica a saber os pares.</p>
+</section>
+
+<form id="create-form" class="card" novalidate>
+  <h2>1. O evento</h2>
+  <label class="field">
+    <span>Nome do evento</span>
+    <input name="title" required maxlength="120" placeholder="Natal da família 2026">
+  </label>
+  <div class="row three">
+    <label class="field">
+      <span>Valor da prenda <em>(opcional)</em></span>
+      <input name="budget" maxlength="60" placeholder="até 20 €">
+    </label>
+    <label class="field">
+      <span>Data da troca <em>(opcional)</em></span>
+      <input name="event_date" type="date">
+    </label>
+    <div class="field">
+      <span id="time-label">Hora <em>(opcional)</em></span>
+      <div class="time24" role="group" aria-labelledby="time-label">
+        <select id="hour" aria-label="Horas">
+          <option value="">--</option>
+          {% for h in range(24) %}<option>{{ "%02d" % h }}</option>{% endfor %}
+        </select>
+        <span aria-hidden="true">:</span>
+        <select id="minute" aria-label="Minutos">
+          {% for m in (0, 15, 30, 45) %}<option>{{ "%02d" % m }}</option>{% endfor %}
+        </select>
+      </div>
+      <input type="hidden" name="event_time">
+    </div>
+  </div>
+  <p class="hint">Com data, o email leva um evento para cada um adicionar ao calendário.</p>
+  <label class="field">
+    <span>Mensagem para todos <em>(opcional)</em></span>
+    <textarea name="message" rows="2" maxlength="1000" placeholder="Jantar em casa da avó às 20h 🎄"></textarea>
+  </label>
+
+  <h2>2. Participantes <span class="count" id="count">0</span></h2>
+  <p class="hint">Pessoas com o mesmo <b>grupo</b> (ex.: um casal, ou irmãos) nunca se tiram umas às outras. Marca o <b>gestor</b> 👑 (obrigatório, com email): recebe o link para gerir o sorteio.{% if email_enabled %} Com o email, a app envia o link a todos por ti.{% endif %}</p>
+
+  <div id="people" class="people"></div>
+
+  <div class="actions-inline">
+    <button type="button" class="btn ghost" id="add-person">+ Adicionar pessoa</button>
+    <button type="button" class="btn ghost" id="paste-toggle">Colar lista de nomes</button>
+  </div>
+
+  <div id="paste-box" class="paste" hidden>
+    <textarea id="paste-text" rows="5" placeholder="Um por linha. Podes usar: Nome, email, grupo&#10;Ana, ana@mail.com, Ana+Rui&#10;Rui, , Ana+Rui&#10;Marta"></textarea>
+    <button type="button" class="btn small" id="paste-apply">Adicionar à lista</button>
+  </div>
+
+
+  <p id="form-error" class="error" hidden></p>
+  <button type="submit" class="btn primary big" id="submit">🎲 Sortear</button>
+  <p class="center"><button type="button" class="link-btn" id="discard">Limpar formulário</button></p>
+</form>
+
+<template id="person-tpl">
+  <div class="person">
+    <input class="p-name" placeholder="Nome" maxlength="80" aria-label="Nome">
+    <input class="p-email" type="email" placeholder="Email" maxlength="200" aria-label="Email">
+    <input class="p-group" placeholder="Grupo" maxlength="80" aria-label="Grupo" list="groups">
+    <label class="manager" title="Marcar como gestor do sorteio"><input type="radio" name="manager" class="p-manager"><span>👑</span></label>
+    <button type="button" class="icon remove" aria-label="Remover">✕</button>
+  </div>
+</template>
+<datalist id="groups"></datalist>
+{% endblock %}

@@ -1,22 +1,21 @@
-version: '3'
+# Stack para o Portainer (Stacks → Add stack → Web editor, ou Repository a apontar para este ficheiro).
+# Define as variáveis na secção "Environment variables" do Portainer — nunca as escrevas aqui (o repo é público).
 services:
-
   secret_friend:
-    build: .
-    image: secret_friend:latest
+    image: ghcr.io/zbuh/secret_friend:latest
     container_name: secret_friend
+    restart: unless-stopped
     ports:
       - "8080:8080"
+    volumes:
+      - secret_friend_data:/data
     environment:
-      - "token=XXXXX"
-      - "smtp_port=587"
-      - "smtp_server_domain_name=smtp.gmail.com"
-      - "sender_mail=XXXXX"
-      - "smtp_password=XXXXX"
+      token: ${token:?Define a password da gestão (token)}
+      base_url: ${base_url:?Define o URL público, ex. https://amigo.exemplo.pt}
+      sender_mail: ${sender_mail:-}
+      smtp_password: ${smtp_password:-}
+      smtp_server_domain_name: ${smtp_server_domain_name:-smtp.gmail.com}
+      smtp_port: ${smtp_port:-587}
 
-    networks:
-      - reverseproxy-nw
-
-networks:
-  reverseproxy-nw:
-    external: true
+volumes:
+  secret_friend_data:

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }}{% endblock %}
+{% block meta %}
+<meta property="og:title" content="🎁 {{ event.title }}">
+<meta property="og:description" content="{{ me.name }}, descobre quem te calhou no amigo secreto!">
+{% endblock %}
+{% block page %}participant{% endblock %}
+{% block content %}
+<section class="hero center">
+  <p class="eyebrow">{{ event.title }}</p>
+  <h1>Olá, {{ me.name }}!</h1>
+</section>
+
+<div class="card reveal-card" id="reveal" data-token="{{ me.token }}"
+     data-share="{{ event.share_token }}" data-name="{{ me.name }}" data-title="{{ event.title }}"
+     data-revealed="{{ 'true' if me.viewed_at else 'false' }}">
+  <div class="gift-stage">
+    <button class="gift" id="gift" aria-label="Abrir a prenda e descobrir o meu amigo secreto">
+      <span class="lid"></span><span class="box"></span><span class="ribbon"></span>
+    </button>
+    <p class="tap" id="tap">Toca na prenda para descobrires o teu amigo secreto</p>
+  </div>
+  <div class="result" id="result" hidden>
+    <p class="muted">O teu amigo secreto é</p>
+    <p class="target" id="target-name">{% if me.viewed_at %}{{ target.name }}{% endif %}</p>
+    <p class="muted small">🤫 Não contes a ninguém!</p>
+    {% if me.viewed_at %}<p class="muted small">Aberto pela primeira vez em <span data-datetime="{{ me.viewed_at }}">{{ me.viewed_at }}</span></p>{% endif %}
+  </div>
+</div>
+
+{% if event.budget or event.event_date or event.message %}
+<div class="card">
+  <p class="chips center">
+    {% if event.budget %}<span class="chip">💶 {{ event.budget }}</span>{% endif %}
+    {% if event.event_date %}<span class="chip" data-date="{{ event.event_date }}" data-time="{{ event.event_time }}">📅 {{ event.event_date }}</span>{% endif %}
+  </p>
+  {% if event.message %}<p class="message">{{ event.message }}</p>{% endif %}
+</div>
+{% endif %}
+
+<p class="center small"><a id="logout" href="/s/{{ event.share_token }}" data-share="{{ event.share_token }}">Não és {{ me.name }}? Sair</a></p>
+{% endblock %}
