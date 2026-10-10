@@ -167,7 +167,9 @@ async def home(request: Request):
 async def create_page(request: Request):
     if not logged_in(request):
         return RedirectResponse("/", status_code=303)
-    return templates.TemplateResponse(request, "create.html", {"email_enabled": mailer.enabled()})
+    return templates.TemplateResponse(
+        request, "create.html", {"email_enabled": mailer.enabled(), "known": db.known_people()}
+    )
 
 
 @app.get("/e/{admin_token}", response_class=HTMLResponse)

@@ -215,6 +215,9 @@ h2.section { margin: 28px 0 4px; }
 .chain .arrow { font-size: 1.2rem; }
 .memory .message { margin-top: 18px; text-align: center; }
 
+.person.autofilled .p-email, .person.autofilled .p-group { animation: autofill 1.2s ease-out; }
+@keyframes autofill { from { background: color-mix(in srgb, var(--gold) 35%, var(--field)); } to { background: var(--field); } }
+
 /* Share page */
 .names { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .name-btn {
