@@ -196,6 +196,14 @@ def test_participant_pages_link_home_to_their_event(client):
     assert f'href="/s/{event["share_token"]}" class="brand"' in client.get(f"/s/{event['share_token']}").text
 
 
+def test_static_assets_are_versioned(anon):
+    from app import main
+
+    page = anon.get("/").text
+    assert f"app.js?v={main.templates.env.globals['asset_version']}" in page
+    assert "?v=2" not in page
+
+
 def test_healthz(anon):
     assert anon.get("/healthz").json() == {"ok": True}
 

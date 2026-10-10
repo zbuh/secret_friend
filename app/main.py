@@ -1,3 +1,4 @@
+import hashlib
 import hmac
 import logging
 import secrets
@@ -53,6 +54,10 @@ async def lifespan(_: FastAPI):
 app = FastAPI(title="Amigo Secreto", version="2.0", lifespan=lifespan, docs_url=None, redoc_url=None)
 app.mount("/static", StaticFiles(directory=HERE / "static"), name="static")
 templates = Jinja2Templates(directory=HERE / "templates")
+# Cache-busting for /static: changes whenever a static file changes, so Cloudflare/browsers never serve stale JS/CSS.
+templates.env.globals["asset_version"] = hashlib.sha256(
+    b"".join(f.read_bytes() for f in sorted((HERE / "static").iterdir()))
+).hexdigest()[:10]
 
 
 @app.middleware("http")
